@@ -13,7 +13,13 @@ export const useGetChat = createQuery({
         return fetch(fetchUrl('getChatHistory'), {
             method: 'POST',
             body: JSON.stringify({chatId}),
-        }).then(res => res.json())
+        })
+            .then(res => {
+                if (res.ok) {
+                    return res.json()
+                }
+                throw new Error('Something went wrong')
+            })
     },
     refetchInterval: 10000,
 })
@@ -23,7 +29,14 @@ export const useGetContact = createMutation({
         fetch(fetchUrl('getContactInfo'), {
             method: 'POST',
             body: JSON.stringify({chatId}),
-        }).then(res => res.json())
+        })
+            .then(res => {
+                if (res.ok) {
+                    return res.json()
+                }
+                throw new Error('Something went wrong')
+            })
+
 })
 
 export const useSendMessage = createMutation({
@@ -31,25 +44,40 @@ export const useSendMessage = createMutation({
         fetch(fetchUrl('sendMessage'), {
             method: 'POST',
             body: JSON.stringify({chatId, message}),
-        }).then(res => res.json()),
+        })
+            .then(res => {
+                if (res.ok) {
+                    return res.json()
+                }
+                throw new Error('Something went wrong')
+            }),
     onSuccess(data, variables) {
         queryClient.setQueryData(['getChatHistory', variables.chatId], messages => {
             return [{...data, ...variables, textMessage: variables.message, type: 'outgoing'}, ...messages]
         })
+        queryClient.fetchQuery(useGetNotifications.getFetchOptions())
+        // queryClient.fetchQuery(useGetChat.getFetchOptions(variables.chatId))
     },
 })
 
 export const useGetNotifications = createQuery({
     queryKey: ['receiveNotification'],
-    fetcher: () => fetch(fetchUrl('receiveNotification')).then(res => res.json()),
+    fetcher: () => fetch(fetchUrl('receiveNotification'))
+        .then(res => {
+            if (res.ok) {
+                return res.json()
+            }
+            throw new Error('Something went wrong')
+        }),
     refetchInterval: 5000,
     onSuccess(data) {
         if (!data) return
         const {body, receiptId} = data
 
         queryClient.setQueryData(['getChatHistory', body.senderData.chatId], (messages = []) => {
+            if (messages.some(message => message.idMessage === body.idMessage)) return
             return [{
-                textMessage: body.messageData.textMessageData.textMessage,
+                textMessage: body.messageData.textMessageData?.textMessage || body.messageData.extendedTextMessageData?.text,
                 type: 'incoming',
                 idMessage: body.idMessage,
                 senderName: body.senderData.senderName
@@ -57,5 +85,12 @@ export const useGetNotifications = createQuery({
         })
 
         fetch(fetchUrl('deleteNotification') + `/${receiptId}`, {method: 'DELETE'})
+            .then(res => {
+                if (res.ok) {
+                    return res.json()
+                }
+                throw new Error('Something went wrong')
+            })
+            .then(() => queryClient.fetchQuery(useGetNotifications.getFetchOptions()))
     }
 })

@@ -10,8 +10,7 @@ function Chat() {
     const[message, setMessage]=useState("");
     const { chatId } = useParams();
 
-    const {data} = useGetChat({variables: chatId})
-    const messages = Array.isArray(data) === true ? data : []
+    const {data: messages} = useGetChat({variables: chatId})
 
     const sendMessage = useSendMessage()
     useGetNotifications()
