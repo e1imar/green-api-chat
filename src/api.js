@@ -49,7 +49,7 @@ export const useGetNotifications = createQuery({
 
         queryClient.setQueryData(['getChatHistory', body.senderData.chatId], (messages = []) => {
             return [{
-                textMessage: body.messageData.extendedTextMessageData.text,
+                textMessage: body.messageData.textMessageData.textMessage,
                 type: 'incoming',
                 idMessage: body.idMessage,
                 senderName: body.senderData.senderName

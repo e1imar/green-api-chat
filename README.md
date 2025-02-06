@@ -4,7 +4,7 @@ To run the project you need to:
 
 > * log in to [Green-API](https://console.green-api.com/).
 > * link your WhatsApp acount.
-> * create .env file in root of project with only variable REACT_APP_HOST = apiUrl (looks like: https://1111.api.greenapi.com).
+> * Configure instance to receive notifications (https://green-api.com/docs/api/receiving/technology-http-api/).
 > * build the project and launch (or start in dev mode)
 > * use idInstance and apiTokenInstance to log in (all credentials can be obtained at [Green-API](https://console.green-api.com/))
 

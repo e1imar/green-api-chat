@@ -7,20 +7,7 @@ import { BrowserRouter , Routes, Route } from "react-router-dom";
 import { useStateValue } from "./login/StateProvider";
 import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
 
-export const defaultQueryFn = ({queryKey}) => {
-  const idInstance = localStorage.getItem('idInstance')
-  const apiTokenInstance = localStorage.getItem('apiTokenInstance')
-  return fetch(`https://${idInstance.slice(0, 4)}.api.greenapi.com/waInstance${idInstance}/${queryKey[0]}/${apiTokenInstance}`)
-      .then(res => res.json())
-}
-
-export const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      queryFn: defaultQueryFn,
-    }
-  }
-})
+export const queryClient = new QueryClient()
 
 function App() {
   const [{user}] = useStateValue();
